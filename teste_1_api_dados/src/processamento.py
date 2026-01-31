@@ -5,7 +5,7 @@ import pandas as pd
 
 def processar_dados(pasta_processed: str, arquivo_saida: str):
 
-#Lê todos os documentos e junta em um único arquivo.
+    # Lê todos os documentos e junta em um único arquivo.
 
     dataframes = []
 
@@ -18,30 +18,31 @@ def processar_dados(pasta_processed: str, arquivo_saida: str):
                     caminho_arquivo = os.path.join(caminho_pasta, arquivo)
                     print(f"Lendo {caminho_arquivo}")
 
-                    df = pd.read_csv(caminho_arquivo, sep=';', encoding='latin1')
+                    df = pd.read_csv(caminho_arquivo, sep=";", encoding="latin1")
                     df["trimestre"] = pasta
                     dataframes.append(df)
 
+    if not dataframes:
+        raise FileNotFoundError(
+            f"Nenhum arquivo .csv encontrado em subpastas de: {pasta_processed}"
+        )
+
     df_final = pd.concat(dataframes, ignore_index=True)
-    df_final.to_csv(arquivo_saida, index=False)
 
-
+    pasta_saida = os.path.dirname(arquivo_saida) or "."
     os.makedirs(pasta_saida, exist_ok=True)
 
-    caminho_csv_temp = os.path.join(pasta_saida, "dados_consolidados.csv")
     caminho_zip = os.path.join(pasta_saida, "dados_consolidados.zip")
 
-    # Salva lista temporário
-    df_final.to_csv(caminho_csv_temp, index=False)
+    # Gera o CSV em memória e grava direto no ZIP (não cria .csv no disco)
+    csv_texto = df_final.to_csv(index=False)
+    csv_bytes = csv_texto.encode("utf-8-sig")
 
-    # Compacta
     with zipfile.ZipFile(caminho_zip, "w", zipfile.ZIP_DEFLATED) as zipf:
-        zipf.write(caminho_csv_temp, arcname="dados_consolidados.csv")
-
-    # Remove lista temporário
-    os.remove(caminho_csv_temp)
+        zipf.writestr("dados_consolidados.csv", csv_bytes)
 
     print("Dados processados e consolidados com sucesso.")
+    print(f"ZIP final: {caminho_zip}")
 
 
 if __name__ == "__main__":
@@ -51,5 +52,4 @@ if __name__ == "__main__":
     os.makedirs(pasta_saida, exist_ok=True)
 
     arquivo_saida = os.path.join(pasta_saida, "dados_consolidados.csv")
-
     processar_dados(pasta_processed, arquivo_saida)
