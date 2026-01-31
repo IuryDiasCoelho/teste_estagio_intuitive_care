@@ -82,10 +82,6 @@ Bibliotecas padrão (os, zipfile, csv)
 
 Organização de pipeline em etapas (ETL)
 
-📌 Observações
-
-As etapas de enriquecimento, agregação e análise fazem parte do escopo do teste e podem ser implementadas na sequência do projeto.
-
 🔎 Limitações e Status do Projeto
 
 A implementação deste projeto contempla integralmente a Etapa 1 – Teste de API e Processamento de Dados, conforme descrito no documento TESTE_ENTRADA_ESTAGIARIOS_v2.pdf.
